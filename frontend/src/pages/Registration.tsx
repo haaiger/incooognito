@@ -1,67 +1,104 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useForm } from "react-hook-form";
+
+import { RegistrationFormData } from "../types";
 
 /** Страница регистрации в системе. */
 function Registration() {
-  const [login, setLogin] = useState("");
-  const [password, setPassword] = useState("");
-  const [email, setEmail] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    console.log("Login Data:", { login, password, email });
-  };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<RegistrationFormData>();
+
+  const handleSubmitForm = (data: RegistrationFormData) =>
+    console.log("Registration Data:", data);
 
   return (
     <>
-      <h1>Чтобы продолжить, нужно войти в систему!</h1>
+      <h1>Регистрация в системе.</h1>
 
       <form
-        onSubmit={handleSubmit}
+        onSubmit={handleSubmit(handleSubmitForm)}
         className="items-center flex flex-col gap-y-5"
       >
         <label
           className="text-gray-700 text-sm font-bold text-center"
           htmlFor="login"
         >
-          Login
+          Логин
           <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            {...register("login", {
+              required: "Логин обязателен!",
+              minLength: {
+                value: 4,
+                message: "Логин должен быть не менее 4 символов!",
+              },
+            })}
+            className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
+              errors.login ? "border-red-500" : ""
+            }`}
             id="login"
             type="text"
-            placeholder="Enter your login"
-            onChange={(e) => setLogin(e.target.value)}
+            placeholder="Введите ваш логин"
           />
         </label>
+
+        {errors.login && (
+          <p className="text-red-500 text-xs">{errors.login.message}</p>
+        )}
 
         <label
           className="text-gray-700 text-sm font-bold text-center"
           htmlFor="email"
         >
-          Email
+          Почта
           <input
+            {...register("email", {
+              pattern: {
+                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                message: "Некорректный формат почты!",
+              },
+            })}
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             id="email"
             type="text"
-            placeholder="Enter your email"
-            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Введите Вашу почту"
           />
         </label>
+
+        {errors.email && (
+          <p className="text-red-500 text-xs">{errors.email.message}</p>
+        )}
 
         <label
           className="text-gray-700 text-sm font-bold text-center"
           htmlFor="password"
         >
-          Password
+          Пароль
           <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            {...register("password", {
+              required: "Пароль обязателен!",
+              minLength: {
+                value: 4,
+                message: "Пароль должен быть не менее 4 символов!",
+              },
+            })}
+            className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
+              errors.password ? "border-red-500" : ""
+            }`}
             id="password"
             type={showPassword ? "text" : "password"}
-            placeholder="Enter your password"
-            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Введите Ваш пароль"
           />
         </label>
+
+        {errors.password && (
+          <p className="text-red-500 text-xs">{errors.password.message}</p>
+        )}
 
         <label className="text-gray-700 text-sm font-bold text-center">
           <input
@@ -70,7 +107,7 @@ function Registration() {
             onChange={() => setShowPassword(!showPassword)}
             className="mr-2"
           />
-          Show Password
+          Показать пароль
         </label>
 
         <div className="flex items-center justify-between">

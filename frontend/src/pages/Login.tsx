@@ -1,52 +1,77 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useForm } from "react-hook-form";
+
+import { LoginFormData } from "../types";
 
 /** Страница для входа в систему. */
 function Login() {
-  const [login, setLogin] = useState("");
-  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    console.log("Login Data:", { login, password });
-  };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormData>();
+
+  const handleSubmitForm = (data: LoginFormData) =>
+    console.log("Login Data:", data);
 
   return (
     <>
       <h1>Чтобы продолжить, нужно войти в систему!</h1>
 
       <form
-        onSubmit={handleSubmit}
+        onSubmit={handleSubmit(handleSubmitForm)}
         className="items-center flex flex-col gap-y-5"
       >
         <label
           className="text-gray-700 text-sm font-bold text-center"
           htmlFor="login"
         >
-          Login
+          Логин
           <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            {...register("login", {
+              required: "Логин обязателен!",
+              minLength: {
+                value: 4,
+                message: "Логин должен быть не менее 4 символов!",
+              },
+            })}
+            className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
+              errors.login ? "border-red-500" : ""
+            }`}
             id="login"
             type="text"
-            placeholder="Enter your login"
-            onChange={(e) => setLogin(e.target.value)}
+            placeholder="Введите Ваш логин"
           />
         </label>
+        {errors.login && <i className="text-red-500">{errors.login.message}</i>}
 
         <label
           className="text-gray-700 text-sm font-bold text-center"
           htmlFor="password"
         >
-          Password
+          Пароль
           <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            {...register("password", {
+              required: "Пароль обязателен!",
+              minLength: {
+                value: 4,
+                message: "Пароль должен быть не менее 4 символов!",
+              },
+            })}
+            className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
+              errors.password ? "border-red-500" : ""
+            }`}
             id="password"
             type={showPassword ? "text" : "password"}
-            placeholder="Enter your password"
-            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Введите Ваш пароль"
           />
         </label>
+        {errors.password && (
+          <i className="text-red-500">{errors.password.message}</i>
+        )}
 
         <label className="text-gray-700 text-sm font-bold text-center">
           <input
@@ -55,7 +80,7 @@ function Login() {
             onChange={() => setShowPassword(!showPassword)}
             className="mr-2"
           />
-          Show Password
+          Показать пароль
         </label>
 
         <div className="flex items-center justify-between">
