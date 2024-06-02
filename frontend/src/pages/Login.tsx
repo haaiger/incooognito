@@ -1,12 +1,17 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 
 import { LoginFormData } from "../types";
+import useAuthorization from "../hooks/useAuthorization";
 
 /** Страница для входа в систему. */
 function Login() {
   const [showPassword, setShowPassword] = useState(false);
+
+  const navigate = useNavigate();
+
+  const auth = useAuthorization();
 
   const {
     register,
@@ -14,8 +19,11 @@ function Login() {
     formState: { errors },
   } = useForm<LoginFormData>();
 
-  const handleSubmitForm = (data: LoginFormData) =>
+  const handleSubmitForm = (data: LoginFormData) => {
     console.log("Login Data:", data);
+    auth.login();
+    navigate("/first");
+  };
 
   return (
     <>
